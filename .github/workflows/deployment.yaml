@@ -1,0 +1,29 @@
+name: continuous integration
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout source files
+        uses: actions/checkout@v3
+
+      - name: Get new version
+        uses: arwynfr/actions-conventional-versioning/get-newVersion@v1
+        id: new-version
+
+      - name: Update module manifest version
+        shell: pwsh
+        run: Update-ModuleManifest -ModuleVersion ${{ steps.new-version.outputs.next-version }} ./ConventionalCommits/ConventionalCommits.psd1
+
+      - name: Publish module on PSGallery
+        shell: pwsh
+        run: Publish-Module -Path ./ConventionalCommits/ -NuGetApiKey ${{ secrets.PSGALLERY_APIKEY }}
+
+      - name: Tag new version on the repository
+        uses: arwynfr/actions-conventional-versioning@v1

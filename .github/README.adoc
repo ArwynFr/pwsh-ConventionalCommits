@@ -1,0 +1,60 @@
+= ConventionalCommits
+
+ConventionalCommits is a pwsh module used for parsing a versioning message in conventional commits format.
+
+image:https://img.shields.io/powershellgallery/v/ConventionalCommits?style=for-the-badge[PowerShell Gallery] image:https://img.shields.io/powershellgallery/dt/ConventionalCommits?style=for-the-badge[PowerShell Gallery] 
+
+== Rules and standards
+
+The following documents provide additional information on rules and standards applying to this project :
+
+- link:/LICENSE[MIT License]
+
+== How to use the module
+
+This module contains a single command :
+
+=== ConvertTo-ConventionalCommitHeader
+
+Returns a structured hastable of a conventional commits message header.
+
+```Powershell
+ConvertTo-ConventionalCommitHeader
+  [[-Message] <string>]
+  [-StrictTypes]
+  [-AdditionalModifiers]
+  [<CommonParameters>]
+```
+
+`-Message`:: *Required* and *Pipelinable*. The versioning message to parse. See https://www.conventionalcommits.org/en/v1.0.0/[conventionalcommits.org] for details on the message structure.
+
+`-StrictTypes`:: *Switch*. If true, the command will enforce the commit type to be in the following list: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`.
+
+`-AdditionalModifiers`:: *Switch*. If true, the command will allow usage of `+` and `-` in addition to `!`. See below.
+
+The command returns a HashTable with the following properties:
+
+- `Type`
+- `Scope`
+- `Modifier`
+- `Description`
+
+== Additions to Conventional Commits 1.0.0
+
+This module introduces two additional modifiers (`+` and `-`) that are not described in Conventional Commits 1.0.0. These modifiers were introduced to explicitly separate the type of semantic version bump from the codebase change type. We use the following convention:
+
+- `!` introduces breaking changes to the public API => major version bump
+- `+` introduces compatible changes to the public API => minor version bump
+- `-` or (empty) means no change to the public API => patch version bump
+
+[IMPORTANT]
+====
+The usage of `feat:` and `+` are not equivalents.
+
+The former indicates addition of new features to your _codebase_, the latter that you made some backward compatible changes to your _public API_. You can add features to your application without changing the public API, and you can add compatible changes to the API without adding a new feature to your application.
+
+Examples:
+
+- `feat: added db encryption` (no API change)
+- `perf+: added ability to filter results` (minor update)
+====
