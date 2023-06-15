@@ -23,7 +23,6 @@ InModuleScope ConventionalCommits {
             It 'Should fail a loose message' {
                 { 'another(scope)!: description' | ConvertTo-ConventionalCommitHeader -StrictTypes } | Should -Throw
             }
-            # 'build'; 'chore'; 'ci'; 'docs'; 'feat'; 'fix'; 'perf'; 'refactor'; 'revert'; 'style'; 'test'
             It 'Should parse a strict message' {
                 $actual = 'build(scope)!: description' | ConvertTo-ConventionalCommitHeader -StrictTypes
                 $actual.Type | Should -Be 'build'

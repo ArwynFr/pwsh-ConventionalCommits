@@ -1,5 +1,55 @@
-function ConvertTo-ConventionalCommitHeader {
+function Get-InternalStructure {
   [CmdletBinding()]
+  [OutputType([hashtable])]
+  param (
+    [Parameter(ValueFromPipeline)]
+    [string]
+    $Message,
+
+    [Parameter()]
+    [switch]
+    $AdditionalModifiers
+  )
+
+  Process {
+    $pattern = $AdditionalModifiers ? '^(\w+)(\((\w+)\))?([!+-])?: (.*)' : '^(\w+)(\((\w+)\))?([!])?: (.*)'
+    $result = $Message -match $pattern
+    if (-not $result) { return $null }
+
+    return @{
+      Type        = $matches[1]
+      Scope       = $matches[3]
+      Modifier    = $matches[4]
+      Description = $matches[5]
+    }
+  }
+}
+
+function Test-InternalStructure {
+  [CmdletBinding()]
+  [OutputType([bool])]
+  param (
+    [Parameter(ValueFromPipeline)]
+    [hashtable]
+    $Header,
+
+    [Parameter()]
+    [switch]
+    $StrictTypes
+  )
+
+  Process {
+    $allowed_types = @('build'; 'chore'; 'ci'; 'docs'; 'feat'; 'fix'; 'perf'; 'refactor'; 'revert'; 'style'; 'test')
+    if ($null -eq $Header) { return $false }
+    if (-not $StrictTypes) { return $true }
+    if (-not $allowed_types.Contains($Header.Type)) { return $false }
+    return $true
+  }
+}
+
+function Test-ConventionalCommitHeader {
+  [CmdletBinding()]
+  [OutputType([bool])]
   param (
     [Parameter(ValueFromPipeline)]
     [string]
@@ -14,24 +64,36 @@ function ConvertTo-ConventionalCommitHeader {
     $AdditionalModifiers
   )
 
-  $allowed_types = @('build'; 'chore'; 'ci'; 'docs'; 'feat'; 'fix'; 'perf'; 'refactor'; 'revert'; 'style'; 'test')
-  $pattern = $AdditionalModifiers ? '^(\w+)(\((\w+)\))?([!+-])?: (.*)' : '^(\w+)(\((\w+)\))?([!])?: (.*)'
-  $result = $Message -match $pattern
-
-  if (-not $result) {
-    throw 'Commit message header does not follow the conventions'
+  Process {
+    return $Message | Get-InternalStructure -AdditionalModifiers:$AdditionalModifiers | Test-InternalStructure -StrictTypes:$StrictTypes
   }
+}
 
-  $conventions = @{
-    Type        = $matches[1]
-    Scope       = $matches[3]
-    Modifier    = $matches[4]
-    Description = $matches[5]
+function ConvertTo-ConventionalCommitHeader {
+  [CmdletBinding()]
+  [OutputType([hashtable])]
+  param (
+    [Parameter(ValueFromPipeline)]
+    [string]
+    $Message,
+
+    [Parameter()]
+    [switch]
+    $StrictTypes,
+
+    [Parameter()]
+    [switch]
+    $AdditionalModifiers
+  )
+
+  Process {
+    $conventions = $Message | Get-InternalStructure -AdditionalModifiers:$AdditionalModifiers
+    $valid = $conventions | Test-InternalStructure -StrictTypes:$StrictTypes
+
+    if (-not $valid ) {
+      throw 'Commit message does not follow the conventions'
+    }
+
+    return $conventions
   }
-
-  if ($StrictTypes -and (-not $allowed_types.Contains($conventions.Type))) {
-    throw 'Commit message header type is not valid'
-  }
-
-  return $conventions
 }
