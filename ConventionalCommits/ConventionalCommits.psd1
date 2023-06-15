@@ -16,5 +16,6 @@
     RootModule      = 'ConventionalCommits.psm1'
     FunctionsToExport = @(
         'ConvertTo-ConventionalCommitHeader'
+        'Test-ConventionalCommitHeader'
     )
 }

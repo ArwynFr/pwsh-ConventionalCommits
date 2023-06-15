@@ -12,7 +12,25 @@ The following documents provide additional information on rules and standards ap
 
 == How to use the module
 
-This module contains a single command :
+This module contains the following commands :
+
+=== Test-ConventionalCommitHeader
+
+Verifies whether the commit message header conforms to the conventional commit format.
+
+```Powershell
+Test-ConventionalCommitHeader
+  [[-Message] <string>]
+  [-StrictTypes]
+  [-AdditionalModifiers]
+  [<CommonParameters>]
+```
+
+`-Message`:: *Required* and *Pipelinable*. The versioning message to parse. See https://www.conventionalcommits.org/en/v1.0.0/[conventionalcommits.org] for details on the message structure.
+
+`-StrictTypes`:: *Switch*. If true, the command will enforce the commit type to be in the following list: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`.
+
+`-AdditionalModifiers`:: *Switch*. If true, the command will allow usage of `+` and `-` in addition to `!`. See below.
 
 === ConvertTo-ConventionalCommitHeader
 
