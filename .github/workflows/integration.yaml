@@ -7,18 +7,8 @@ on:
 
 jobs:
   integration:
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Checkout source files
-        uses: actions/checkout@v3
-      
-      - name: Run unit tests
-        shell: pwsh
-        run: ./build/test.ps1
-
-      - name: Run codacy-coverage-reporter
-        uses: codacy/codacy-coverage-reporter-action@v1
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: coverage.xml
+    uses: ArwynFr/ArwynFr/.github/workflows/pwsh-integration.yaml@main
+    with:
+      tests: ./tests/Start-Tests.ps1
+    secrets:
+      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
