@@ -9,6 +9,6 @@ jobs:
   integration:
     uses: ArwynFr/ArwynFr/.github/workflows/pwsh-integration.yaml@main
     with:
-      tests: ./test/Start-Tests.ps1
+      tests: ./tests/Start-Tests.ps1
     secrets:
       CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
